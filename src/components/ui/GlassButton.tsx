@@ -8,6 +8,8 @@
  */
 
 import classNames from 'classnames';
+import { Link } from 'react-router-dom';
+import type { LinkProps } from 'react-router-dom';
 import { cls } from '@/utils/cx';
 import type { JSX, ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from 'react';
 import { Icon } from '@/assets/icons/Icon';
@@ -59,6 +61,18 @@ export type GlassLinkProps = BaseProps &
   };
 
 /**
+ * Props for the client-side navigation form.
+ *
+ * `href` renders a plain anchor, which reloads the document. Internal
+ * destinations should use `to` instead so navigation stays inside the SPA and
+ * the route chunk loads on demand.
+ */
+export type GlassRouteProps = BaseProps &
+  Omit<LinkProps, keyof BaseProps | 'to'> & {
+    to: string;
+  };
+
+/**
  * Builds the class list for a glass button.
  *
  * @param variant - Visual treatment.
@@ -88,11 +102,13 @@ function classesFor(
 /**
  * Renders a frosted-glass button or link.
  *
- * @param props - Button or link props. Presence of `href` selects the anchor
- *   form.
+ * @param props - Button, link or route props. `to` selects the router `Link`
+ *   form, `href` the plain anchor form, and neither a `<button>`.
  * @returns A `<button>` or `<a>` element.
  */
-export function GlassButton(props: GlassButtonProps | GlassLinkProps): JSX.Element {
+export function GlassButton(
+  props: GlassButtonProps | GlassLinkProps | GlassRouteProps,
+): JSX.Element {
   const {
     variant = 'secondary',
     size = 'md',
@@ -127,6 +143,22 @@ export function GlassButton(props: GlassButtonProps | GlassLinkProps): JSX.Eleme
       {iconOnly ? <span className="ww-sr-only">{children}</span> : children}
     </>
   );
+
+  // Checked before `href`: an internal route must not fall through to a
+  // document-reloading anchor.
+  if ('to' in props) {
+    const { to, ...linkRest } = props as Omit<GlassRouteProps, keyof BaseProps>;
+    return (
+      <Link
+        to={to}
+        className={classes}
+        aria-disabled={disabled === true || undefined}
+        {...linkRest}
+      >
+        {content}
+      </Link>
+    );
+  }
 
   if (isLink) {
     const { href, ...anchorRest } = rest as Omit<GlassLinkProps, keyof BaseProps>;

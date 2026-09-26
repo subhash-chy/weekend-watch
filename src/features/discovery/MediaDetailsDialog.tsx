@@ -16,6 +16,8 @@ import type { JSX, MouseEvent } from 'react';
 import { Icon } from '@/assets/icons/Icon';
 import { Rating } from '@/components/ui/Rating';
 import { GlassButton } from '@/components/ui/GlassButton';
+import { resolvePlayback } from '@/services/playback/resolver';
+import { watchPath } from '@/utils/constants';
 import { useFocusTrap, useBodyScrollLock } from '@/hooks/use-focus-trap';
 import { resolveBackdropSrc, backdropSrcSet } from '@/services/tmdb/images';
 import { formatReleaseDate, genreLabels, formatCompactCount } from '@/utils/format';
@@ -60,6 +62,9 @@ export function MediaDetailsDialog({
   const backdrop = resolveBackdropSrc(item);
   const srcSet = backdropSrcSet(item.backdropPath);
   const genres = genreLabels(item.genreIds);
+
+  // Pure and synchronous, so it is safe to call during render.
+  const playback = resolvePlayback(item);
 
   /** Closes when the backdrop itself is clicked, not when the panel is. */
   const handleBackdropClick = (event: MouseEvent<HTMLDivElement>): void => {
@@ -149,7 +154,23 @@ export function MediaDetailsDialog({
           </p>
 
           <div className={styles.actions}>
-            <GlassButton variant="primary" size="md" onClick={onClose}>
+            {/*
+              Playback is the primary action, so it takes the filled treatment
+              and comes first in tab order. It is only offered when a source
+              actually resolves — a Watch button that leads nowhere is worse
+              than no button.
+            */}
+            {playback.status === 'available' ? (
+              <GlassButton
+                variant="primary"
+                size="md"
+                to={watchPath(item.mediaType, item.id)}
+              >
+                <Icon name="play" size={16} aria-hidden="true" />
+                Watch now
+              </GlassButton>
+            ) : null}
+            <GlassButton variant="secondary" size="md" onClick={onClose}>
               Close
             </GlassButton>
           </div>

@@ -66,6 +66,32 @@ surface it appears on.
 - Loading states are `aria-busy`; skeleton cards are `aria-hidden` because the
   status text already announces the state.
 
+## The player
+
+The transport is the highest-risk surface in the app for accessibility, because
+custom media players are where `div`-based sliders and unlabelled icon buttons
+usually appear. The choices:
+
+- **The seek bar and volume slider are native `<input type="range">`**, styled
+  but not replaced. That keeps `role="slider"`, arrow-key operation and
+  screen-reader value announcements for free; `aria-valuetext` renders them as
+  `1:23 of 9:56` and `80 percent` rather than raw numbers.
+- Every icon-only control carries an `aria-label`, and the icons are
+  `aria-hidden`.
+- Controls fade out on pointer idle, but stay in the tab order — hiding them
+  with `visibility` or `display` would strand a keyboard user who tabbed in
+  while the pointer was still. `:focus-within` also forces them back on.
+- State changes a sighted user sees instantly (muted, speed, captions) go to a
+  polite live region.
+- Transport errors are a `role="alert"` with a retry action, so a codec or
+  network failure is announced rather than silently frozen.
+
+One rule is deliberately disabled: `jsx-a11y/no-noninteractive-element-interactions`
+on the player container. The container is `role="group"` — correct, because it is
+a labelled set of controls rather than a widget — and the shortcuts are attached
+there so they work whichever control has focus. The region is reached through its
+focusable children, never directly.
+
 ## Known gap
 
 Contrast is verified against a **synthetic worst-case** background, not against

@@ -139,3 +139,30 @@ export function formatCompactCount(count: number): string {
     maximumFractionDigits: 1,
   }).format(count);
 }
+
+/**
+ * Formats a duration in seconds as a clock value.
+ *
+ * Emits `M:SS` under an hour and `H:MM:SS` above it, matching the convention
+ * every mainstream player uses. Minutes are zero-padded in the hours form so
+ * the value does not jitter in width as it ticks.
+ *
+ * Non-finite and negative inputs — which a media element produces before its
+ * metadata loads (`NaN`) — collapse to `0:00` rather than `NaN`.
+ *
+ * @param totalSeconds - Duration in seconds.
+ * @returns A formatted clock string.
+ */
+export function formatDuration(totalSeconds: number): string {
+  if (!Number.isFinite(totalSeconds) || totalSeconds < 0) return '0:00';
+
+  const total = Math.floor(totalSeconds);
+  const seconds = total % 60;
+  const minutes = Math.floor(total / 60) % 60;
+  const hours = Math.floor(total / 3600);
+
+  const pad = (value: number): string => String(value).padStart(2, '0');
+
+  if (hours > 0) return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+  return `${minutes}:${pad(seconds)}`;
+}

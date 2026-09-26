@@ -23,7 +23,14 @@ const SECURITY_HEADERS = {
 
 /**
  * Strict production policy. Nothing is loaded from a third-party origin except
- * TMDB (images + API), and there is no `unsafe-inline` for scripts.
+ * TMDB (images + API) and the media origins, and there is no `unsafe-inline`
+ * for scripts.
+ *
+ * `media-src` is what lets the in-app player fetch a stream. `blob:` is
+ * included because MediaSource-based playback hands the element an object URL.
+ * If you point `VITE_PLAYBACK_BASE_URL` at your own CDN, add that origin here
+ * (and to `MEDIA_ORIGINS` in `docs/deployment.md`) or playback will be blocked
+ * by the policy rather than by anything in the player.
  */
 const STRICT_CSP = [
   "default-src 'self'",
@@ -33,6 +40,7 @@ const STRICT_CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://image.tmdb.org",
   "font-src 'self' data:",
+  "media-src 'self' blob: https://storage.googleapis.com",
   "connect-src 'self' https://api.themoviedb.org",
   "frame-ancestors 'none'",
   "form-action 'self'",
@@ -51,6 +59,7 @@ const DEV_CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://image.tmdb.org",
   "font-src 'self' data:",
+  "media-src 'self' blob: https://storage.googleapis.com",
   "connect-src 'self' ws: wss: https://api.themoviedb.org",
   "form-action 'self'",
 ].join('; ');

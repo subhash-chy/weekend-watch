@@ -44,11 +44,61 @@ a Chrome binary.
 - **Discovery** — a hero carousel of trending titles plus scroll-snapped rails
   for now-playing, popular and top-rated content, with a Streaming / On TV
   filter.
+- **Playback** — a custom in-app player at `/watch/:mediaType/:id`: play/pause,
+  scrubbing, ±10 s skips, volume, speed, captions, picture-in-picture and
+  fullscreen, all driven by a plain `<video>` element. No embed, no iframe, no
+  player SDK.
 - **Search** — debounced, URL-driven (`/search?query=…`), so results are
   shareable and Back works.
 - **Details** — a modal with a focus trap, focus restore and scroll lock.
 - **Feedback everywhere** — skeletons while loading, empty states for no
   results, toasts for errors, and a route-level error boundary.
+
+## Playback
+
+The player is built directly on `<video>`. There is no third-party player, no
+YouTube embed and no iframe — which is also why the transport can look like the
+rest of the app.
+
+**What actually plays.** TMDB is a metadata service: it publishes posters,
+synopses and ratings, and never video files. There is no legal source of
+commercial movie streams to point a player at, so the demo catalogue resolves to
+openly licensed films — the Blender Foundation's CC-BY open movies and Google's
+public test clips — and the player is genuinely exercised end to end.
+
+Resolution is isolated in `services/playback/`, so pointing it at real licensed
+media touches one file and no UI:
+
+```bash
+# every title then resolves to ${base}/${mediaType}/${id}.mp4
+VITE_PLAYBACK_BASE_URL=https://media.example.com
+```
+
+Two requirements for your own media: files must be MP4/WebM the browser can
+decode, and the server must honour HTTP range requests or seeking will not work.
+The origin must also be added to `media-src` in the Content-Security-Policy.
+
+A title with no resolvable source renders an explanation instead of a Play
+button. Set `VITE_PLAYBACK_DISABLED=1` to exercise that state.
+
+The player chunk is **4.8 KB gzipped** and loads only when someone actually
+plays something.
+
+### Keyboard
+
+| Keys          | Action                    |
+| ------------- | ------------------------- |
+| `Space` / `K` | Play / pause              |
+| `←` / `→`     | Skip 10 seconds           |
+| `↑` / `↓`     | Volume                    |
+| `M`           | Mute                      |
+| `F`           | Full screen               |
+| `C`           | Captions (when available) |
+| `Home`/`End`  | Jump to start / end       |
+
+The seek bar and volume slider are real `<input type="range">` elements that are
+visually replaced, so native keyboard operation, `role="slider"` semantics and
+screen-reader value announcements come for free.
 
 ## Architecture
 
@@ -111,10 +161,12 @@ See [`docs/accessibility.md`](docs/accessibility.md).
 
 ## Performance
 
-- **105 KB** of JavaScript gzipped in total (107,712 B measured with `gzip -9`);
-  **103 KB** on first load, the rest arriving lazily per route
-- ~79 KB of that is the cached `react` chunk (81,004 B), which app-only changes
+- **112 KB** of JavaScript gzipped in total (114,758 B measured with `gzip -9`);
+  **101 KB** on first load, the rest arriving lazily per route
+- ~79 KB of that is the cached `react` chunk (81,017 B), which app-only changes
   do not invalidate
+- The player is its own chunk (4,795 B) and the search page another (1,536 B);
+  neither is downloaded until its route is visited
 - Route-level code splitting for `/search` and the 404 page
 - Self-hosted variable WOFF2 fonts with `font-display: swap`; no font CDN
 - Posters ship `srcset`, explicit `width`/`height` (342×513) to prevent layout

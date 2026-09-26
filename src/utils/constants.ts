@@ -49,7 +49,20 @@ export const GENRES: Readonly<Record<number, string>> = {
 export const ROUTES = {
   home: '/',
   search: '/search',
+  /** Parameterised; build a concrete link with {@link watchPath}. */
+  watch: '/watch/:mediaType/:id',
 } as const;
+
+/**
+ * Builds a concrete watch URL for a catalogue entry.
+ *
+ * @param mediaType - `movie` or `tv`.
+ * @param id - Catalogue id.
+ * @returns An absolute in-app path, e.g. `/watch/movie/24`.
+ */
+export function watchPath(mediaType: 'movie' | 'tv' | 'person', id: number): string {
+  return `/watch/${mediaType}/${id}`;
+}
 
 /** Query parameter that preselects the discovery catalogue toggle. */
 export const CATALOGUE_PARAM = 'catalogue';

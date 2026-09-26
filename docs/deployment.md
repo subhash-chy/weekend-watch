@@ -36,8 +36,9 @@ Production:
 ```
 default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self';
 style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.tmdb.org;
-font-src 'self' data:; connect-src 'self' https://api.themoviedb.org;
-frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+font-src 'self' data:; media-src 'self' blob: https://storage.googleapis.com;
+connect-src 'self' https://api.themoviedb.org; frame-ancestors 'none';
+form-action 'self'; upgrade-insecure-requests
 ```
 
 Three deliberate choices:
@@ -47,6 +48,11 @@ Three deliberate choices:
 - **`style-src 'unsafe-inline'` is retained.** Vite injects critical CSS and
   CSS Modules emit `<style>` tags; removing it would require nonce plumbing that
   a static host cannot supply. Styles are never built from user input.
+- **`media-src` names the playback origins.** The in-app player fetches streams
+  directly, so any origin serving media must be listed here or the browser
+  blocks the request before the player ever sees an error. `blob:` is included
+  because MediaSource-based playback hands the element an object URL. Add your
+  own CDN here when you set `VITE_PLAYBACK_BASE_URL`.
 - **`frame-ancestors 'none'`** plus `X-Frame-Options: DENY` blocks
   clickjacking.
 
@@ -67,7 +73,7 @@ that opens a websocket.
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Resource-Policy = "same-origin"
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.tmdb.org; font-src 'self' data:; connect-src 'self' https://api.themoviedb.org; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://image.tmdb.org; font-src 'self' data:; media-src 'self' blob: https://storage.googleapis.com; connect-src 'self' https://api.themoviedb.org; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
 
 [[redirects]]
   from = "/*"

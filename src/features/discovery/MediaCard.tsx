@@ -17,9 +17,12 @@ import type { JSX } from 'react';
  */
 
 import classNames from 'classnames';
+import { Link } from 'react-router-dom';
 import { Icon } from '@/assets/icons/Icon';
 import { Rating } from '@/components/ui/Rating';
 import { resolvePosterSrc, resolvePosterSrcSet } from '@/services/tmdb/images';
+import { resolvePlayback } from '@/services/playback/resolver';
+import { watchPath } from '@/utils/constants';
 import { formatReleaseDate } from '@/utils/format';
 import type { MediaItem } from '@/types/media';
 import styles from './MediaCard.module.css';
@@ -62,34 +65,50 @@ export function MediaCard({
   const releaseDate = formatReleaseDate(item.releaseDate);
   const kindLabel = item.mediaType === 'tv' ? 'Series' : 'Film';
 
+  // Only offer playback when something can actually play. Rendering a Play
+  // button that leads to an error page is worse than not rendering one.
+  const playable = resolvePlayback(item).status === 'available';
+
   return (
     <article className={classNames(styles.card, className)}>
-      <button
-        type="button"
-        className={styles.posterButton}
-        onClick={() => onSelect(item)}
-        // The button's accessible name is the title plus enough context that a
-        // screen-reader user browsing by button knows what it does.
-        aria-label={`${item.title} — ${kindLabel}, released ${releaseDate}. View details.`}
-      >
-        <span className={styles.posterFrame}>
-          <img
-            className={styles.poster}
-            src={posterSrc}
-            {...(posterSrcSet !== undefined ? { srcSet: posterSrcSet } : {})}
-            sizes="(max-width: 640px) 44vw, (max-width: 1024px) 26vw, 176px"
-            width={POSTER_WIDTH}
-            height={POSTER_HEIGHT}
-            alt=""
-            loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
-            fetchPriority={priority ? 'high' : 'auto'}
-          />
-          <span className={styles.posterScrim} aria-hidden="true">
-            <Icon name="info" size={22} />
+      <div className={styles.posterWrap}>
+        <button
+          type="button"
+          className={styles.posterButton}
+          onClick={() => onSelect(item)}
+          // The button's accessible name is the title plus enough context that a
+          // screen-reader user browsing by button knows what it does.
+          aria-label={`${item.title} — ${kindLabel}, released ${releaseDate}. View details.`}
+        >
+          <span className={styles.posterFrame}>
+            <img
+              className={styles.poster}
+              src={posterSrc}
+              {...(posterSrcSet !== undefined ? { srcSet: posterSrcSet } : {})}
+              sizes="(max-width: 640px) 44vw, (max-width: 1024px) 26vw, 176px"
+              width={POSTER_WIDTH}
+              height={POSTER_HEIGHT}
+              alt=""
+              loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
+              fetchPriority={priority ? 'high' : 'auto'}
+            />
+            <span className={styles.posterScrim} aria-hidden="true">
+              <Icon name="info" size={22} />
+            </span>
           </span>
-        </span>
-      </button>
+        </button>
+
+        {playable ? (
+          <Link
+            to={watchPath(item.mediaType, item.id)}
+            className={styles.playBadge}
+            aria-label={`Play ${item.title}`}
+          >
+            <Icon name="play" size={16} aria-hidden="true" />
+          </Link>
+        ) : null}
+      </div>
 
       <div className={styles.meta}>
         <h3 className={styles.title} title={item.title}>

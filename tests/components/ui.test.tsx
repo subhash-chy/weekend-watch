@@ -9,6 +9,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { Rating } from '@/components/ui/Rating';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { GlassButton } from '@/components/ui/GlassButton';
@@ -207,9 +208,22 @@ describe('GlassButton', () => {
   });
 });
 
+/**
+ * Renders a card inside a router.
+ *
+ * The card emits a real in-app `<Link>` for playback, and react-router's `Link`
+ * reads the router from context — rendering it bare throws.
+ *
+ * @param ui - The element to render.
+ * @returns Testing Library's render result.
+ */
+function renderCard(ui: React.ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+}
+
 describe('MediaCard', () => {
   it('declares explicit width and height so the poster cannot shift layout', () => {
-    render(<MediaCard item={makeItem()} onSelect={() => {}} />);
+    renderCard(<MediaCard item={makeItem()} onSelect={() => {}} />);
     const image = document.querySelector('img');
     expect(image).not.toBeNull();
     expect(image).toHaveAttribute('width', '342');
@@ -220,29 +234,33 @@ describe('MediaCard', () => {
     // alt="" makes the poster presentational; if it also carried alt text the
     // title would be announced twice — once by the image, once by the button.
     // The card's Rating does expose role="img", so assert on the poster itself.
-    render(<MediaCard item={makeItem()} onSelect={() => {}} />);
+    renderCard(<MediaCard item={makeItem()} onSelect={() => {}} />);
     const poster = document.querySelector('img') as HTMLImageElement;
     expect(poster.alt).toBe('');
   });
 
   it('lazy-loads by default and loads eagerly when prioritised', () => {
-    const { rerender } = render(<MediaCard item={makeItem()} onSelect={() => {}} />);
+    const { rerender } = renderCard(<MediaCard item={makeItem()} onSelect={() => {}} />);
     expect(document.querySelector('img')).toHaveAttribute('loading', 'lazy');
 
-    rerender(<MediaCard item={makeItem()} onSelect={() => {}} priority />);
+    rerender(
+      <MemoryRouter>
+        <MediaCard item={makeItem()} onSelect={() => {}} priority />
+      </MemoryRouter>,
+    );
     expect(document.querySelector('img')).toHaveAttribute('loading', 'eager');
     expect(document.querySelector('img')).toHaveAttribute('fetchpriority', 'high');
   });
 
   it('names the card button with title, kind, date and intent', () => {
-    render(<MediaCard item={makeItem()} onSelect={() => {}} />);
+    renderCard(<MediaCard item={makeItem()} onSelect={() => {}} />);
     expect(screen.getByRole('button')).toHaveAccessibleName(
       'Neon Meridian — Film, released Mar 12, 2025. View details.',
     );
   });
 
   it('labels TV items as Series', () => {
-    render(
+    renderCard(
       <MediaCard
         item={makeItem({ mediaType: 'tv', title: 'Harbour Lights' })}
         onSelect={() => {}}
@@ -257,14 +275,14 @@ describe('MediaCard', () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     const item = makeItem();
-    render(<MediaCard item={item} onSelect={onSelect} />);
+    renderCard(<MediaCard item={item} onSelect={onSelect} />);
 
     await user.click(screen.getByRole('button'));
     expect(onSelect).toHaveBeenCalledWith(item);
   });
 
   it('falls back to generated artwork when TMDB has no poster', () => {
-    render(<MediaCard item={makeItem({ posterPath: null })} onSelect={() => {}} />);
+    renderCard(<MediaCard item={makeItem({ posterPath: null })} onSelect={() => {}} />);
     const image = document.querySelector('img') as HTMLImageElement;
     expect(image.src).toContain('data:image/svg+xml');
     // Generated artwork has no alternate renditions.
@@ -272,7 +290,9 @@ describe('MediaCard', () => {
   });
 
   it('emits a srcSet when a real poster path exists', () => {
-    render(<MediaCard item={makeItem({ posterPath: '/abc.jpg' })} onSelect={() => {}} />);
+    renderCard(
+      <MediaCard item={makeItem({ posterPath: '/abc.jpg' })} onSelect={() => {}} />,
+    );
     const image = document.querySelector('img') as HTMLImageElement;
     expect(image).toHaveAttribute('srcset');
     expect(image.getAttribute('srcset')).toContain('185w');

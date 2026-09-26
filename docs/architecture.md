@@ -113,6 +113,35 @@ Measured with `gzip -9` over `dist/assets/*.js`:
 First load pays 105,470 B (~103 KB); the lazy chunks arrive only when their
 route is visited.
 
+## Playback
+
+The player is the one feature with a dependency that is not code.
+
+TMDB supplies metadata only — no video files. So `services/playback/` sits
+between the catalogue and the player and answers one question: _is there
+anything to play for this title?_
+
+```
+WatchPage
+  └─ resolvePlayback(item)            services/playback/resolver.ts
+       ├─ VITE_PLAYBACK_BASE_URL?  →  ${base}/${mediaType}/${id}.mp4
+       ├─ VITE_PLAYBACK_DISABLED?  →  { status: 'unavailable', reason }
+       └─ otherwise                →  services/playback/sources.ts (CC-BY demo clips)
+```
+
+Two properties worth keeping:
+
+1. **`unavailable` is a first-class result, not an error.** A title with no
+   licence to stream renders an explanation. Rendering a Play button that leads
+   to a failed request is worse than rendering nothing.
+2. **The player never knows where media comes from.** `hooks/use-media-player.ts`
+   takes a URL and drives a `<video>` element. Swapping the demo registry for a
+   CDN, an authenticated edge function or a local library changes one file.
+
+`WatchPage` keys the player by source URL, so switching title remounts it. That
+is what keeps transport state fresh, and it is why the hook needs no
+"reset on URL change" effect of its own.
+
 ## Why some dependencies were removed
 
 | Removed                    | Replaced by                            | Reason                                                                                                                                 |

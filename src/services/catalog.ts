@@ -10,13 +10,13 @@
  * it locally. See `docs/architecture.md`.
  */
 
-import type { MediaPage } from '@/types/media';
+import type { MediaItem, MediaPage } from '@/types/media';
 import { shouldUseMockCatalogue } from '@/services/tmdb/config';
 import { tmdbFetch, toError } from '@/services/tmdb/client';
-import { parseMediaPage, SchemaError } from '@/services/tmdb/schema';
+import { parseMediaItem, parseMediaPage, SchemaError } from '@/services/tmdb/schema';
 import { endpointKey, searchEndpoint } from '@/services/tmdb/endpoints';
 import type { EndpointDescriptor } from '@/services/tmdb/endpoints';
-import { getMockPage, searchMockCatalogue } from '@/services/mock/catalog';
+import { getMockItem, getMockPage, searchMockCatalogue } from '@/services/mock/catalog';
 
 /**
  * Artificial delay applied to mock responses.
@@ -168,4 +168,50 @@ export function isAbortError(cause: unknown): boolean {
     'kind' in cause &&
     (cause as { kind: unknown }).kind === 'abort'
   );
+}
+
+/**
+ * Fetches a single catalogue entry by id.
+ *
+ * Used by the watch route, which has to work from a bare URL: someone shares
+ * `/watch/movie/24` and there is no list already in cache to read from.
+ *
+ * @param mediaType - `movie` or `tv`.
+ * @param id - Catalogue id.
+ * @param signal - Optional `AbortSignal`.
+ * @returns The normalised entry.
+ * @throws {Error} Carries a user-facing `message` and a `kind` discriminant.
+ */
+export async function fetchMediaDetails(
+  mediaType: 'movie' | 'tv',
+  id: number,
+  signal?: AbortSignal,
+): Promise<MediaItem> {
+  if (shouldUseMockCatalogue()) {
+    await delay(MOCK_LATENCY_MS);
+    const item = getMockItem(id);
+    if (item === undefined) {
+      throw toError({
+        kind: 'http',
+        message: 'That title is not in the offline catalogue.',
+        status: 404,
+      });
+    }
+    return item;
+  }
+
+  try {
+    const raw: unknown = await tmdbFetch(
+      `/${mediaType}/${id}`,
+      {},
+      signal === undefined ? {} : { signal },
+    );
+    const item = parseMediaItem(raw, mediaType);
+    if (item === null) {
+      throw new SchemaError('The Movie Database returned an unrecognised title.');
+    }
+    return item;
+  } catch (cause) {
+    throw normaliseError(cause);
+  }
 }

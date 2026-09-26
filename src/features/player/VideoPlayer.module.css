@@ -1,0 +1,390 @@
+/**
+ * Video player chrome.
+ *
+ * The control bar is a glass panel floating over the media, so it inherits the
+ * same four-layer treatment as the rest of the UI rather than looking like a
+ * browser widget dropped on top.
+ *
+ * Contrast note: text sits on `--media-scrim` composited over the video. That
+ * scrim is `rgba(3,6,12,.90)`, which composites to #1c1f24 — 16.5:1 against
+ * white — so the labels stay legible over any frame.
+ */
+
+.player {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  /* Contain paint so the control bar's blur cannot sample outside the player. */
+  contain: paint;
+}
+
+.player.is-fullscreen {
+  aspect-ratio: auto;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* --- Buffering + big play ------------------------------------------------ */
+
+.buffering {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.spinner {
+  color: #fff;
+  filter: drop-shadow(0 2px 8px rgb(0 0 0 / 60%));
+}
+
+.bigPlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  width: 76px;
+  height: 76px;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255 255 255 / 14%);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-full);
+  box-shadow: 0 18px 50px -18px rgb(0 0 0 / 70%);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out);
+}
+
+.bigPlay:hover {
+  background: rgba(255 255 255 / 22%);
+  transform: translate3d(0, -2px, 0) scale(1.04);
+}
+
+/* --- Error --------------------------------------------------------------- */
+
+.error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  color: #fff;
+  text-align: center;
+  background: var(--media-scrim);
+}
+
+.errorMessage {
+  max-width: 46ch;
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.retry {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255 255 255 / 14%);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-md);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.retry:hover {
+  background: rgba(255 255 255 / 22%);
+}
+
+/* --- Control bar --------------------------------------------------------- */
+
+.controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background: linear-gradient(
+    to top,
+    rgb(3 6 12 / 92%),
+    rgb(3 6 12 / 55%) 60%,
+    transparent
+  );
+  opacity: 1;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+/*
+ * Hidden controls are transparent but stay in the tab order. Using
+ * `visibility: hidden` or `display: none` would strand a keyboard user who
+ * tabbed into the player while the pointer was idle.
+ */
+.controls.is-hidden {
+  opacity: 0;
+}
+
+.controls.is-hidden:focus-within {
+  opacity: 1;
+}
+
+.seekRow {
+  position: relative;
+  height: 20px;
+  margin-bottom: var(--space-2);
+}
+
+.seekTrack {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(255 255 255 / 24%);
+  border-radius: var(--radius-full);
+  transform: translateY(-50%);
+  transition: height var(--duration-fast) var(--ease-out);
+}
+
+.seekRow:hover .seekTrack {
+  height: 7px;
+}
+
+.seekBuffered {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(255 255 255 / 34%);
+}
+
+.seekPlayed {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--accent-fill);
+}
+
+.buttonRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.control {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: #fff;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.control:hover {
+  background: rgba(255 255 255 / 14%);
+}
+
+.control:active {
+  transform: translate3d(0, 1px, 0);
+}
+
+.control.is-active {
+  background: rgba(255 255 255 / 18%);
+  border-color: var(--glass-border-strong);
+}
+
+.time {
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  color: #eaf0f8;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* --- Volume -------------------------------------------------------------- */
+
+.volumeGroup {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* --- Native ranges, visually replaced ------------------------------------ */
+
+.seekInput,
+.volumeInput {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.seekInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+}
+
+.volumeInput {
+  width: 84px;
+  height: 20px;
+  margin: 0;
+}
+
+.seekInput::-webkit-slider-runnable-track,
+.volumeInput::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+  border-radius: var(--radius-full);
+}
+
+.seekInput::-moz-range-track,
+.volumeInput::-moz-range-track {
+  height: 4px;
+  background: transparent;
+  border-radius: var(--radius-full);
+}
+
+.seekInput::-webkit-slider-thumb,
+.volumeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  margin-top: -4.5px;
+  background: #fff;
+  border: 0;
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 60%);
+}
+
+.seekInput::-moz-range-thumb,
+.volumeInput::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  background: #fff;
+  border: 0;
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 60%);
+}
+
+/* Volume gets its own filled track, since there is no overlay behind it. */
+.volumeInput::-webkit-slider-runnable-track {
+  background: rgba(255 255 255 / 28%);
+}
+
+.volumeInput::-moz-range-track {
+  background: rgba(255 255 255 / 28%);
+}
+
+/* --- Rate selector ------------------------------------------------------- */
+
+.rateField {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rateSelect {
+  height: 32px;
+  padding: 0 var(--space-2);
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255 255 255 / 12%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.rateSelect:hover {
+  background: rgba(255 255 255 / 20%);
+}
+
+/* The dropdown list is drawn by the OS, so it needs an opaque background or
+   the white text lands on a white sheet. */
+.rateSelect option {
+  color: #14161a;
+  background: #fff;
+}
+
+/* --- Attribution --------------------------------------------------------- */
+
+.attribution {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-4);
+  margin: 0;
+  padding: 2px var(--space-2);
+  font-size: var(--text-caption);
+  color: #eaf0f8;
+  background: rgb(3 6 12 / 70%);
+  border-radius: var(--radius-sm);
+}
+
+/* --- Small screens ------------------------------------------------------- */
+
+@media (width <= 560px) {
+  .volumeInput {
+    display: none;
+  }
+
+  .time {
+    font-size: var(--text-caption);
+  }
+
+  .attribution {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bigPlay,
+  .control,
+  .controls,
+  .seekTrack {
+    transition: none;
+  }
+}

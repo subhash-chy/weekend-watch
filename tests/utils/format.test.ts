@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clamp,
   formatCompactCount,
+  formatDuration,
   formatReleaseDate,
   formatYear,
   genreLabels,
@@ -128,5 +129,35 @@ describe('formatCompactCount', () => {
 
   it('is safe for non-finite input', () => {
     expect(formatCompactCount(Number.NaN)).toBe('0');
+  });
+});
+
+describe('formatDuration', () => {
+  it('renders sub-hour durations as M:SS with a padded second', () => {
+    expect(formatDuration(0)).toBe('0:00');
+    expect(formatDuration(7)).toBe('0:07');
+    expect(formatDuration(65)).toBe('1:05');
+    expect(formatDuration(596)).toBe('9:56');
+  });
+
+  it('switches to H:MM:SS at an hour and pads the minutes', () => {
+    expect(formatDuration(3600)).toBe('1:00:00');
+    expect(formatDuration(3661)).toBe('1:01:01');
+    expect(formatDuration(7325)).toBe('2:02:05');
+  });
+
+  it('collapses the NaN a media element reports before metadata loads', () => {
+    // `video.duration` is NaN until loadedmetadata fires; the transport must
+    // show a clock value, not the literal string "NaN".
+    expect(formatDuration(Number.NaN)).toBe('0:00');
+    expect(formatDuration(Number.POSITIVE_INFINITY)).toBe('0:00');
+  });
+
+  it('never renders a negative clock', () => {
+    expect(formatDuration(-12)).toBe('0:00');
+  });
+
+  it('floors fractional seconds rather than rounding them up', () => {
+    expect(formatDuration(59.9)).toBe('0:59');
   });
 });

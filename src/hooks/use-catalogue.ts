@@ -9,8 +9,13 @@
 
 import useSWR from 'swr';
 import type { SWRConfiguration } from 'swr';
-import type { MediaPage } from '@/types/media';
-import { fetchCatalogue, searchCatalogue, isAbortError } from '@/services/catalog';
+import type { MediaItem, MediaPage } from '@/types/media';
+import {
+  fetchCatalogue,
+  fetchMediaDetails,
+  searchCatalogue,
+  isAbortError,
+} from '@/services/catalog';
 import { endpointKey } from '@/services/tmdb/endpoints';
 import type { EndpointDescriptor } from '@/services/tmdb/endpoints';
 
@@ -116,6 +121,59 @@ export function useSearch(query: string, page = 1): CatalogueQuery {
     // rely on a single boolean.
     isLoading: key === null ? false : isLoading,
     isValidating,
+    error: isAbortError(error) ? undefined : error,
+    retry: () => {
+      void mutate();
+    },
+  };
+}
+
+/** Shape returned by {@link useMediaDetails}. */
+export interface MediaDetailsQuery {
+  /** The entry, or `undefined` until the response lands. */
+  data: MediaItem | undefined;
+  /** True on the very first load. */
+  isLoading: boolean;
+  /** The caught error, or `undefined`. Never set for cancellations. */
+  error: unknown;
+  /** Imperatively re-run the request. */
+  retry: () => void;
+}
+
+/**
+ * Fetches one catalogue entry by id.
+ *
+ * Backs the watch route, which must resolve from a URL alone. The key is
+ * disabled (`null`) when the route params are invalid, so a malformed link
+ * renders the not-found state instead of firing a request that cannot succeed.
+ *
+ * @param mediaType - `movie` or `tv`, or `undefined` when the param is invalid.
+ * @param id - Catalogue id, or `undefined` when the param is not numeric.
+ * @returns The query state for that entry.
+ */
+export function useMediaDetails(
+  mediaType: 'movie' | 'tv' | undefined,
+  id: number | undefined,
+): MediaDetailsQuery {
+  const key =
+    mediaType !== undefined && id !== undefined ? `tmdb:${mediaType}/${id}` : null;
+
+  const { data, error, isLoading, mutate } = useSWR<MediaItem, Error>(
+    key,
+    () => {
+      // Both are guaranteed by the key being non-null; the assertion is local
+      // and cannot drift from the check above.
+      if (mediaType === undefined || id === undefined) {
+        throw new Error('mediaType and id are required to fetch details.');
+      }
+      return fetchMediaDetails(mediaType, id);
+    },
+    { ...LIST_CONFIG, keepPreviousData: false, dedupingInterval: 5 * 60_000 },
+  );
+
+  return {
+    data,
+    isLoading: key === null ? false : isLoading,
     error: isAbortError(error) ? undefined : error,
     retry: () => {
       void mutate();

@@ -1,0 +1,150 @@
+/**
+ * Watch page layout.
+ *
+ * The player is the widest thing on the page and is capped so it stays a
+ * comfortable size on ultrawide monitors instead of stretching to a letterbox
+ * strip. Everything below it is constrained to a readable measure.
+ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-block: var(--space-6) var(--space-9);
+}
+
+.back {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-secondary);
+  text-decoration: none;
+  background: var(--glass-tint);
+  backdrop-filter: var(--glass-blur) var(--glass-saturate);
+  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturate);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.back:hover {
+  color: var(--ink-primary);
+  background: var(--glass-tint-hover);
+  transform: translate3d(-2px, 0, 0);
+}
+
+/* --- Loading placeholders ------------------------------------------------ */
+
+.playerSkeleton {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.titleSkeleton {
+  height: 40px;
+  max-width: 32ch;
+}
+
+.bodySkeleton {
+  height: 72px;
+  max-width: 68ch;
+}
+
+/* --- Metadata ------------------------------------------------------------ */
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 72ch;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--ink-primary);
+  letter-spacing: var(--tracking-tight);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  align-items: center;
+  font-size: var(--text-small);
+  color: var(--ink-secondary);
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.genre {
+  padding: 2px var(--space-3);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--ink-secondary);
+  background: var(--glass-tint);
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--radius-full);
+}
+
+.overview {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  color: var(--ink-secondary);
+}
+
+/* --- No playable source -------------------------------------------------- */
+
+.unavailable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-7);
+  color: var(--ink-secondary);
+  background: var(--glass-tint);
+  backdrop-filter: var(--glass-blur) var(--glass-saturate);
+  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturate);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.note {
+  max-width: 62ch;
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+@media (width <= 720px) {
+  .page {
+    gap: var(--space-4);
+    padding-block: var(--space-4) var(--space-7);
+  }
+
+  .heading {
+    font-size: var(--text-h3);
+  }
+}

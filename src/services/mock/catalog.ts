@@ -401,3 +401,17 @@ export function searchMockCatalogue(query: string): MediaPage {
   );
   return toPage(matches);
 }
+
+/**
+ * Looks a single title up by id, as a details request would.
+ *
+ * Searches the combined trending list rather than only the one implied by the
+ * route, because that mix contains both movies and shows and a shared deep link
+ * may carry either.
+ *
+ * @param id - Catalogue id.
+ * @returns The matching item, or `undefined` when absent.
+ */
+export function getMockItem(id: number): MediaItem | undefined {
+  return MOCK_TRENDING.find((item) => item.id === id);
+}

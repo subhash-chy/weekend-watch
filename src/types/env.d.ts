@@ -17,6 +17,14 @@ interface ImportMetaEnv {
   readonly VITE_TMDB_BASE_URL?: string;
   /** Set to `"1"` to force the offline mock catalogue even with a key present. */
   readonly VITE_USE_MOCK_CATALOGUE?: string;
+  /**
+   * Origin serving playable media. When set, every title resolves to
+   * `${base}/${mediaType}/${id}.mp4` and the demo clips are not used. The
+   * origin must also appear in the Content-Security-Policy `media-src`.
+   */
+  readonly VITE_PLAYBACK_BASE_URL?: string;
+  /** Set to `"1"` to disable playback resolution entirely. */
+  readonly VITE_PLAYBACK_DISABLED?: string;
 }
 
 interface ImportMeta {

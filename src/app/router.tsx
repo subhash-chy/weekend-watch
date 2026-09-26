@@ -23,6 +23,12 @@ const SearchPage = lazy(async () => {
   return { default: module.SearchPage };
 });
 
+/** In-app player — loaded only when someone actually plays something. */
+const WatchPage = lazy(async () => {
+  const module = await import('@/features/player/WatchPage');
+  return { default: module.WatchPage };
+});
+
 /** 404 — loaded only when an unknown path is hit. */
 const NotFoundPage = lazy(async () => {
   const module = await import('@/features/error/NotFoundPage');
@@ -40,6 +46,7 @@ export function AppRoutes(): JSX.Element {
       <Routes>
         <Route path={ROUTES.home} element={<DiscoveryPage />} />
         <Route path={ROUTES.search} element={<SearchPage />} />
+        <Route path={ROUTES.watch} element={<WatchPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
