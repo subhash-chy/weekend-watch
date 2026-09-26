@@ -40,7 +40,7 @@ const STRICT_CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://image.tmdb.org",
   "font-src 'self' data:",
-  "media-src 'self' blob: https://storage.googleapis.com",
+  "media-src 'self' blob: https://storage.googleapis.com https://interactive-examples.mdn.mozilla.net https://www.w3schools.com",
   "connect-src 'self' https://api.themoviedb.org",
   "frame-ancestors 'none'",
   "form-action 'self'",
@@ -59,7 +59,7 @@ const DEV_CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://image.tmdb.org",
   "font-src 'self' data:",
-  "media-src 'self' blob: https://storage.googleapis.com",
+  "media-src 'self' blob: https://storage.googleapis.com https://interactive-examples.mdn.mozilla.net https://www.w3schools.com",
   "connect-src 'self' ws: wss: https://api.themoviedb.org",
   "form-action 'self'",
 ].join('; ');

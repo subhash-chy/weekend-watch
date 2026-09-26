@@ -43,7 +43,7 @@ function configuredBaseUrl(): string | null {
  * @param item - The catalogue entry.
  * @returns A playable source from the demo registry.
  */
-function demoSourceFor(item: MediaItem): PlaybackSource {
+function demoSourcesFor(item: MediaItem): PlaybackSource[] {
   const index = Math.abs(item.id) % DEMO_CLIPS.length;
   // Modulo over a non-empty array, so this is always defined; the fallback only
   // exists because `noUncheckedIndexedAccess` cannot know that.
@@ -51,7 +51,7 @@ function demoSourceFor(item: MediaItem): PlaybackSource {
   if (clip === undefined) {
     throw new Error('The demo clip registry must not be empty.');
   }
-  return clip.source;
+  return [...clip.sources];
 }
 
 /**
@@ -72,14 +72,16 @@ export function resolvePlayback(item: MediaItem): PlaybackResolution {
   if (base !== null) {
     return {
       status: 'available',
-      source: {
-        kind: 'progressive',
-        url: `${base}/${item.mediaType}/${item.id}.mp4`,
-      },
+      sources: [
+        {
+          kind: 'progressive',
+          url: `${base}/${item.mediaType}/${item.id}.mp4`,
+        },
+      ],
     };
   }
 
-  return { status: 'available', source: demoSourceFor(item) };
+  return { status: 'available', sources: demoSourcesFor(item) };
 }
 
 /**
@@ -89,5 +91,5 @@ export function resolvePlayback(item: MediaItem): PlaybackResolution {
  * @returns The source when available, otherwise `null`.
  */
 export function sourceOrNull(resolution: PlaybackResolution): PlaybackSource | null {
-  return resolution.status === 'available' ? resolution.source : null;
+  return resolution.status === 'available' ? (resolution.sources[0] ?? null) : null;
 }

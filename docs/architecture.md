@@ -126,7 +126,7 @@ WatchPage
   └─ resolvePlayback(item)            services/playback/resolver.ts
        ├─ VITE_PLAYBACK_BASE_URL?  →  ${base}/${mediaType}/${id}.mp4
        ├─ VITE_PLAYBACK_DISABLED?  →  { status: 'unavailable', reason }
-       └─ otherwise                →  services/playback/sources.ts (CC-BY demo clips)
+       └─ otherwise                →  services/playback/sources.ts (multi-mirror clips)
 ```
 
 Two properties worth keeping:
@@ -134,9 +134,15 @@ Two properties worth keeping:
 1. **`unavailable` is a first-class result, not an error.** A title with no
    licence to stream renders an explanation. Rendering a Play button that leads
    to a failed request is worse than rendering nothing.
-2. **The player never knows where media comes from.** `hooks/use-media-player.ts`
-   takes a URL and drives a `<video>` element. Swapping the demo registry for a
-   CDN, an authenticated edge function or a local library changes one file.
+2. **Every clip lists several origins, rendered as `<source>` elements.** Public
+   sample-video hosts keep dying — the Google bucket that powered an earlier
+   revision went private, turning every play into a MediaError 4. `<source>`
+   fallback makes the browser advance to the next mirror on failure, with no
+   retry loop and no library.
+3. **The player never knows where media comes from.** `hooks/use-media-player.ts`
+   takes a list of URLs and drives a `<video>` element. Swapping the demo
+   registry for a CDN, an authenticated edge function or a local library changes
+   one file.
 
 `WatchPage` keys the player by source URL, so switching title remounts it. That
 is what keeps transport state fresh, and it is why the hook needs no

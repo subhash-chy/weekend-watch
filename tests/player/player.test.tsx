@@ -52,7 +52,12 @@ describe('Watch route', () => {
 
     const element = document.querySelector('video');
     expect(element).not.toBeNull();
-    expect(element).toHaveAttribute('src');
+    // The media rides on <source> children (mirror fallback), not a src attr.
+    const sources = element?.querySelectorAll('source') ?? [];
+    expect(sources.length).toBeGreaterThan(0);
+    for (const source of Array.from(sources)) {
+      expect(source.getAttribute('src')).toMatch(/^https:\/\/.+\.mp4$/);
+    }
   });
 
   it('does not use the browser’s native controls', async () => {

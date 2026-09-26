@@ -63,8 +63,14 @@ rest of the app.
 **What actually plays.** TMDB is a metadata service: it publishes posters,
 synopses and ratings, and never video files. There is no legal source of
 commercial movie streams to point a player at, so the demo catalogue resolves to
-openly licensed films — the Blender Foundation's CC-BY open movies and Google's
-public test clips — and the player is genuinely exercised end to end.
+openly licensed sample media — Mozilla's CC0 clips and W3Schools' Big Buck Bunny
+excerpt — and the player is genuinely exercised end to end.
+
+Public sample hosts rot: the once-canonical Google `gtv-videos-bucket` now
+returns `AccessDenied` to anonymous callers. So every clip carries **several**
+`<source>` elements across independent origins, and the browser natively falls
+through to the next if one mirror dies. A single hard-coded origin is a playback
+outage waiting to happen.
 
 Resolution is isolated in `services/playback/`, so pointing it at real licensed
 media touches one file and no UI:

@@ -162,8 +162,8 @@ function WatchView({ mediaType, id }: WatchViewProps): JSX.Element {
             no reset effect of its own.
           */}
           <VideoPlayer
-            key={resolution.source.url}
-            source={resolution.source}
+            key={resolution.sources[0]?.url ?? String(data.id)}
+            sources={resolution.sources}
             title={data.title}
           />
 

@@ -53,8 +53,10 @@ describe('resolvePlayback', () => {
 
     expect(resolution.status).toBe('available');
     if (resolution.status !== 'available') return;
-    expect(resolution.source.kind).toBe('progressive');
-    expect(resolution.source.url).toMatch(/^https:\/\/.+\.mp4$/);
+    const primary = resolution.sources[0];
+    expect(primary).toBeDefined();
+    expect(primary?.kind).toBe('progressive');
+    expect(primary?.url).toMatch(/^https:\/\/.+\.mp4$/);
   });
 
   it('is deterministic, so a shared link always plays the same film', () => {
@@ -68,7 +70,9 @@ describe('resolvePlayback', () => {
     const urls = new Set(
       Array.from({ length: DEMO_CLIPS.length * 3 }, (_, index) => {
         const resolution = resolvePlayback(makeItem({ id: index + 1 }));
-        return resolution.status === 'available' ? resolution.source.url : '';
+        return resolution.status === 'available'
+          ? (resolution.sources[0]?.url ?? '')
+          : '';
       }),
     );
 
@@ -91,7 +95,7 @@ describe('resolvePlayback', () => {
     expect(resolution.status).toBe('available');
     if (resolution.status !== 'available') return;
     // The trailing slash on the base must not produce a doubled separator.
-    expect(resolution.source.url).toBe('https://media.example.com/tv/99.mp4');
+    expect(resolution.sources[0]?.url).toBe('https://media.example.com/tv/99.mp4');
   });
 
   it('reports a reason instead of a source when playback is disabled', () => {
@@ -108,7 +112,10 @@ describe('resolvePlayback', () => {
     const resolution = resolvePlayback(makeItem());
     if (resolution.status !== 'available') throw new Error('expected a source');
 
-    expect(resolution.source.attribution).toMatch(/CC-BY|sample clip/);
+    // Every source carries credit, as the licences require.
+    for (const source of resolution.sources) {
+      expect(source.attribution).toMatch(/CC-BY|CC0|sample media/);
+    }
   });
 });
 

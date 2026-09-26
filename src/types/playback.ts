@@ -58,7 +58,7 @@ export interface PlaybackSource {
  * render a button that fails.
  */
 export type PlaybackResolution =
-  | { readonly status: 'available'; readonly source: PlaybackSource }
+  | { readonly status: 'available'; readonly sources: readonly PlaybackSource[] }
   | { readonly status: 'unavailable'; readonly reason: string };
 
 /** Live state the player mirrors out of the `<video>` element. */

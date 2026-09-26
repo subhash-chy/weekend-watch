@@ -36,8 +36,12 @@ const CONTROLS_IDLE_MS = 2600;
 
 /** Props accepted by {@link VideoPlayer}. */
 export interface VideoPlayerProps {
-  /** Resolved media source. */
-  readonly source: PlaybackSource;
+  /**
+   * Candidate sources, in preference order. Rendered as `<source>` elements so
+   * the browser natively advances to the next when a host fails — which is how
+   * the player survives a mirror going private.
+   */
+  readonly sources: readonly PlaybackSource[];
   /** Accessible name for the player region, normally the title. */
   readonly title: string;
 }
@@ -45,11 +49,17 @@ export interface VideoPlayerProps {
 /**
  * Renders the player and its transport controls.
  *
- * @param source - What to play.
+ * @param sources - What to play, with fallbacks.
  * @param title - Human-readable title, used for labelling.
  * @returns The player element.
  */
-export function VideoPlayer({ source, title }: VideoPlayerProps): JSX.Element {
+export function VideoPlayer({ sources, title }: VideoPlayerProps): JSX.Element {
+  // The first source drives metadata that the whole player shares (poster,
+  // MediaSession title). The resolver always supplies at least one.
+  const primaryUrl = sources[0]?.url ?? '';
+  const primaryPoster = sources[0]?.posterUrl;
+  const attribution = sources[0]?.attribution;
+
   const {
     videoRef,
     containerRef,
@@ -63,14 +73,14 @@ export function VideoPlayer({ source, title }: VideoPlayerProps): JSX.Element {
     toggleFullscreen,
     togglePictureInPicture,
     retry,
-  } = useMediaPlayer(source.url, source.posterUrl);
+  } = useMediaPlayer(primaryUrl, primaryPoster);
 
   const idleTimer = useRef<number | null>(null);
   const [isIdle, setIsIdle] = useState(false);
   const [announcement, setAnnouncement] = useState('');
   const [captionsOn, setCaptionsOn] = useState(false);
 
-  const hasCaptions = (source.captions?.length ?? 0) > 0;
+  const hasCaptions = (sources[0]?.captions?.length ?? 0) > 0;
 
   /**
    * Whether the control bar is showing.
@@ -255,17 +265,24 @@ export function VideoPlayer({ source, title }: VideoPlayerProps): JSX.Element {
       role="group"
       aria-label={`${title} player`}
     >
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- captions are attached when the source provides them */}
+      {/*
+        No `src` attribute: the media comes from `<source>` children so the
+        browser can fall through the mirror list. A `src` would win over the
+        children and defeat the fallback entirely.
+      */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- captions are attached when a source provides them */}
       <video
         ref={videoRef}
         className={cls(styles, 'video')}
-        src={source.url}
-        poster={source.posterUrl}
+        poster={primaryPoster}
         preload="metadata"
         playsInline
         onClick={togglePlay}
       >
-        {source.captions?.map((track) => (
+        {sources.map((source) => (
+          <source key={source.url} src={source.url} />
+        ))}
+        {sources[0]?.captions?.map((track) => (
           <track
             key={track.language}
             kind="subtitles"
@@ -473,8 +490,8 @@ export function VideoPlayer({ source, title }: VideoPlayerProps): JSX.Element {
         </div>
       </div>
 
-      {source.attribution !== undefined ? (
-        <p className={cls(styles, 'attribution')}>{source.attribution}</p>
+      {attribution !== undefined ? (
+        <p className={cls(styles, 'attribution')}>{attribution}</p>
       ) : null}
 
       <p className="ww-sr-only" role="status" aria-live="polite">
