@@ -1,0 +1,47 @@
+/**
+ * ErrorState styles.
+ *
+ * Centred, capped-width panel so a long API message cannot stretch across a
+ * 4K display. Uses the raised glass recipe from globals.css.
+ */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+}
+
+.iconBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+
+  color: var(--status-danger);
+  background-color: rgba(255, 107, 129, 0.14);
+  border: 1px solid rgba(255, 107, 129, 0.34);
+}
+
+.title {
+  font-size: var(--text-h3);
+  color: var(--ink-primary);
+}
+
+.message {
+  font-size: var(--text-body);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+.retry {
+  margin-top: var(--space-2);
+}

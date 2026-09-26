@@ -1,0 +1,194 @@
+/**
+ * Design tokens for the Liquid Glass (Glassmorphism 2.0) system.
+ *
+ * Every colour token below is verified against WCAG 2.1 by
+ * `scripts/contrast.mjs`. The alpha values in the `--glass-*` tokens are load
+ * bearing: they are the values the contrast script composites over a
+ * worst-case white backdrop. Do not tweak them without re-running:
+ *
+ *     node scripts/contrast.mjs
+ *
+ * Spacing follows an 8px grid (4px half-steps). Motion is capped at 150–250ms.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- */
+  /* Spacing — 8px grid                                               */
+  /* ---------------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /** Max content width; 4K displays get comfortable gutters instead of stretch. */
+  --measure: 1600px;
+  --gutter: clamp(16px, 4vw, 64px);
+
+  /* ---------------------------------------------------------------- */
+  /* Typography — fluid scale                                         */
+  /* ---------------------------------------------------------------- */
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk Variable", var(--font-sans);
+
+  --text-caption: 0.75rem; /* 12px */
+  --text-small: 0.875rem; /* 14px */
+  --text-body: 1rem; /* 16px */
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-h3: 1.25rem; /* 20px */
+  --text-h2: clamp(1.375rem, 1.1rem + 1.1vw, 2rem); /* 22→32px */
+  --text-h1: clamp(1.75rem, 1.2rem + 2.2vw, 3rem); /* 28→48px */
+  --text-display: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem); /* 36→72px */
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 800;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+
+  /* ---------------------------------------------------------------- */
+  /* Colour — ink (foreground)                                        */
+  /*                                                                  */
+  /* All three pass 4.5:1 on the *brightest* possible glass surface     */
+  /* (surface/raised-hover → #555960). See scripts/contrast.mjs.        */
+  /* ---------------------------------------------------------------- */
+  --ink-primary: #ffffff; /* 7.07:1 worst case */
+  --ink-secondary: #eaf0f8; /* 6.17:1 worst case */
+  --ink-tertiary: #c6d2e2; /* 4.62:1 worst case */
+
+  /** Decoration only — never use for body text (fails 4.5:1 on glass). */
+  --ink-disabled: #8a94a3;
+
+  /* ---------------------------------------------------------------- */
+  /* Colour — accent                                                  */
+  /* ---------------------------------------------------------------- */
+  /** Brand coral. Glows + ≥24px display type only (3.48:1 vs white). */
+  --accent: #ff3b5c;
+  /** Opaque fills that carry body text — 5.07:1 vs white. */
+  --accent-fill: #d81b3c;
+  --accent-fill-hover: #b3112a;
+  --accent-fill-active: #8f0f22;
+  /** Soft tint for selected/active glass states. */
+  --accent-tint: rgba(255, 59, 92, 0.18);
+  --accent-soft-glow: rgba(255, 59, 92, 0.42);
+
+  /* ---------------------------------------------------------------- */
+  /* Colour — status                                                  */
+  /* ---------------------------------------------------------------- */
+  --status-success: #34d399;
+  --status-warning: #fbbf24;
+  --status-danger: #ff6b81;
+  --status-info: #8fd3ff;
+
+  /* ---------------------------------------------------------------- */
+  /* Glass surfaces — values mirrored by scripts/contrast.mjs         */
+  /* ---------------------------------------------------------------- */
+  --glass-blur: 18px;
+  --glass-saturate: 180%;
+
+  /** Page chrome over the ambient gradient (dark backdrop, so no scrim). */
+  --glass-page: rgba(255, 255, 255, 0.04);
+
+  /** Frosted header floating over arbitrary bright imagery. */
+  --glass-header-scrim: rgba(6, 10, 20, 0.86);
+  --glass-header-tint: rgba(255, 255, 255, 0.06);
+
+  /** Raised cards, panels, popovers. */
+  --glass-scrim: rgba(8, 13, 24, 0.8);
+  --glass-tint: rgba(255, 255, 255, 0.08);
+  --glass-tint-hover: rgba(255, 255, 255, 0.14);
+
+  /** Inset control wells (segmented controls, input backgrounds). */
+  --glass-inset-shade: rgba(0, 0, 0, 0.28);
+
+  /** Scrim placed between artwork and overlaid text. */
+  --media-scrim: rgba(3, 6, 12, 0.9);
+  --media-scrim-gradient: linear-gradient(
+    to top,
+    rgba(3, 6, 12, 0.94) 0%,
+    rgba(3, 6, 12, 0.72) 45%,
+    rgba(3, 6, 12, 0.15) 100%
+  );
+
+  /* ---------------------------------------------------------------- */
+  /* Borders, highlights, focus                                       */
+  /* ---------------------------------------------------------------- */
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-strong: rgba(255, 255, 255, 0.24);
+  --glass-hairline: rgba(255, 255, 255, 0.08);
+
+  /** Specular reflection painted on the top-left edge of every glass pane. */
+  --glass-reflection: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.04) 38%,
+    rgba(255, 255, 255, 0) 60%
+  );
+
+  --focus-ring: #8fd3ff; /* ≥3:1 on every surface (1.4.11) */
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+  /* ---------------------------------------------------------------- */
+  /* Elevation                                                        */
+  /* ---------------------------------------------------------------- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.48), 0 8px 20px rgba(0, 0, 0, 0.32);
+  --shadow-accent: 0 10px 36px rgba(216, 27, 60, 0.45);
+
+  /* ---------------------------------------------------------------- */
+  /* Motion — strictly 150–250ms                                      */
+  /* ---------------------------------------------------------------- */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.44, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------------------------------------------------------------- */
+  /* Layout                                                           */
+  /* ---------------------------------------------------------------- */
+  --header-height: 72px;
+  --card-poster-ratio: 2 / 3;
+  --rail-height: 336px;
+
+  /* ---------------------------------------------------------------- */
+  /* Ambient background                                               */
+  /* ---------------------------------------------------------------- */
+  --ambient-base: #05070e;
+  --ambient-bloom-a: rgba(58, 92, 196, 0.28);
+  --ambient-bloom-b: rgba(196, 44, 88, 0.22);
+  --ambient-bloom-c: rgba(28, 132, 156, 0.18);
+
+  color-scheme: dark;
+}
+
+/*
+ * Container queries need a stable breakpoint vocabulary shared by every
+ * feature module.
+ */
+:root {
+  --rail-card-min: 176px;
+  --grid-card-min: 160px;
+}

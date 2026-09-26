@@ -1,0 +1,101 @@
+/**
+ * DiscoveryPage styles.
+ *
+ * The trending grid uses a **container query** rather than a media query: card
+ * sizing responds to the width of the grid's own container (`cqi` units), so
+ * the same markup adapts correctly whether it is full-width on a 4K display or
+ * constrained inside a sidebar. That is the difference between a layout that
+ * merely fits and one that composes.
+ */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-8);
+}
+
+.headlineRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  /* Establishes a query container for the grid below. */
+  container-type: inline-size;
+  container-name: discovery;
+}
+
+.headlineHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: var(--text-h2);
+  color: var(--ink-primary);
+}
+
+.sectionDescription {
+  font-size: var(--text-body);
+  color: var(--ink-tertiary);
+}
+
+/* Cards are sized from the container's inline size, not the viewport. */
+.trendingTrack {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(max(160px, 16cqi), 1fr));
+}
+
+.trendingItem {
+  min-width: 0;
+}
+
+/* Skeleton grid must match the real grid exactly so nothing shifts on swap. */
+.railSkeleton {
+  grid-template-columns: repeat(auto-fill, minmax(max(160px, 16cqi), 1fr));
+  gap: var(--space-4);
+}
+
+.empty {
+  padding-block: var(--space-6);
+  color: var(--ink-tertiary);
+  font-size: var(--text-body);
+}
+
+/* Very wide displays: cap the number of columns so cards do not become
+   unreasonably large. */
+@container discovery (min-width: 1400px) {
+  .trendingTrack,
+  .railSkeleton {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+/* Narrow containers: two columns, matching the mobile rail. */
+@container discovery (max-width: 519px) {
+  .trendingTrack,
+  .railSkeleton {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 639px) {
+  .main {
+    gap: var(--space-6);
+    padding-top: var(--space-5);
+  }
+}

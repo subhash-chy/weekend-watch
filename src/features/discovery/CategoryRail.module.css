@@ -1,0 +1,152 @@
+/**
+ * CategoryRail styles.
+ *
+ * The track is a native horizontal scroller with CSS scroll-snap. Scrollbars
+ * are hidden because the arrow buttons are the visible affordance, but the row
+ * stays keyboard-scrollable — hiding a scrollbar never removes scrolling.
+ *
+ * Card width is fluid (`clamp`) so the same markup works from 320px phones to
+ * 4K displays without a JavaScript measurement pass.
+ */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.headings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-h2);
+  color: var(--ink-primary);
+}
+
+.description {
+  font-size: var(--text-body);
+  color: var(--ink-tertiary);
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-2);
+  flex: none;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+
+  border: 1px solid var(--glass-border);
+  background-color: var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  color: var(--ink-primary);
+
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .arrow:hover:not(:disabled) {
+    background-color: var(--glass-tint-hover);
+    border-color: var(--glass-border-strong);
+    transform: scale3d(1.06, 1.06, 1);
+  }
+}
+
+.arrow:active:not(:disabled) {
+  transform: scale3d(0.96, 0.96, 1);
+}
+
+.arrow:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.track {
+  display: flex;
+  gap: var(--space-4);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  /* Breathing room so the lift-on-hover shadow is not clipped at the edges. */
+  padding-block: var(--space-2);
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    scroll-behavior: auto;
+  }
+}
+
+.item {
+  flex: 0 0 auto;
+  width: clamp(140px, 11vw, 190px);
+  scroll-snap-align: start;
+}
+
+/* Skeleton placeholder grid needs the same card width as real cards so the
+   swap in is pixel-identical. */
+.grid {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(140px, 11vw, 190px);
+  gap: var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.empty {
+  padding-block: var(--space-6);
+  color: var(--ink-tertiary);
+  font-size: var(--text-body);
+}
+
+/* Narrow screens: two cards per viewport width so the row reads as a carousel
+   rather than a sliver of one card. */
+@media (max-width: 639px) {
+  .item,
+  .grid {
+    grid-auto-columns: 44vw;
+  }
+
+  .item {
+    width: 44vw;
+  }
+
+  .controls {
+    display: none;
+  }
+}

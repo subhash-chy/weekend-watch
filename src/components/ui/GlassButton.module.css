@@ -1,0 +1,176 @@
+/**
+ * GlassButton styles.
+ *
+ * States covered: default, hover, active, focus-visible (from globals.css),
+ * disabled and loading. Every transition is 150–250ms and animates only
+ * compositor-friendly properties.
+ */
+
+.button {
+  position: relative;
+  isolation: isolate;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-normal);
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+
+/* Specular highlight so buttons read as glass rather than flat pills. */
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: var(--glass-reflection);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* Sizes — 8px grid                                                 */
+/* ---------------------------------------------------------------- */
+
+.size-sm {
+  height: 32px;
+  padding-inline: var(--space-3);
+  font-size: var(--text-small);
+}
+
+.size-md {
+  height: 40px;
+  padding-inline: var(--space-4);
+  font-size: var(--text-body);
+}
+
+.size-lg {
+  height: 56px;
+  padding-inline: var(--space-5);
+  font-size: var(--text-body-lg);
+}
+
+.iconOnly.size-sm {
+  width: 32px;
+  padding-inline: 0;
+}
+.iconOnly.size-md {
+  width: 40px;
+  padding-inline: 0;
+}
+.iconOnly.size-lg {
+  width: 56px;
+  padding-inline: 0;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- */
+/* Variants                                                         */
+/* ---------------------------------------------------------------- */
+
+/* Primary carries body text on an opaque fill: #D81B3C is 5.07:1 vs white. */
+.variant-primary {
+  background-color: var(--accent-fill);
+  color: var(--ink-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.variant-secondary {
+  background-color: var(--glass-tint);
+  border-color: var(--glass-border);
+  color: var(--ink-primary);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--shadow-sm);
+}
+
+.variant-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--ink-secondary);
+}
+
+.variant-danger {
+  background-color: rgba(179, 17, 42, 0.22);
+  border-color: rgba(255, 107, 129, 0.4);
+  color: var(--ink-primary);
+}
+
+/* ---------------------------------------------------------------- */
+/* Interaction                                                      */
+/* ---------------------------------------------------------------- */
+
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    transform: translate3d(0, -2px, 0);
+  }
+
+  .variant-primary:hover:not(:disabled) {
+    background-color: var(--accent-fill-hover);
+    box-shadow: var(--shadow-accent);
+  }
+
+  .variant-secondary:hover:not(:disabled) {
+    background-color: var(--glass-tint-hover);
+    border-color: var(--glass-border-strong);
+  }
+
+  .variant-ghost:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--ink-primary);
+  }
+
+  .variant-danger:hover:not(:disabled) {
+    background-color: rgba(179, 17, 42, 0.36);
+    border-color: rgba(255, 107, 129, 0.6);
+  }
+}
+
+.button:active:not(:disabled) {
+  transform: translate3d(0, 0, 0) scale3d(0.98, 0.98, 1);
+  transition-duration: var(--duration-fast);
+}
+
+/* Disabled controls are exempt from contrast requirements, but they still get
+   a visible treatment plus `cursor: not-allowed`. */
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.button[aria-busy="true"] {
+  cursor: progress;
+}
+
+.icon {
+  flex: none;
+}
+
+.spinner {
+  flex: none;
+  animation: ww-spin 800ms linear infinite;
+}

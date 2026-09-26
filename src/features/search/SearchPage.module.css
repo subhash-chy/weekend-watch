@@ -1,0 +1,75 @@
+/**
+ * SearchPage styles.
+ *
+ * The results grid is a plain auto-fill grid — no carousel here, because search
+ * results are a list to be scanned, not a showcase.
+ */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  /* Container for the responsive card sizing below. */
+  container-type: inline-size;
+  container-name: results;
+}
+
+.heading {
+  font-size: var(--text-h1);
+  color: var(--ink-primary);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fill, minmax(max(150px, 15cqi), 1fr));
+}
+
+.gridItem {
+  min-width: 0;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+
+  max-width: 34rem;
+  padding: var(--space-6) var(--space-5);
+}
+
+.emptyTitle {
+  font-size: var(--text-h3);
+  color: var(--ink-primary);
+}
+
+.emptyText {
+  font-size: var(--text-body);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+/* Small screens: two columns, matching the discovery grid so the card size is
+   consistent as the user navigates between pages. */
+@container results (max-width: 519px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+@container results (min-width: 1400px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+}

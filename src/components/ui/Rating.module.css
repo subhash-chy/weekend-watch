@@ -1,0 +1,46 @@
+/**
+ * Rating styles.
+ *
+ * The filled row is an overlay clipped by percentage width, so partial stars
+ * (e.g. 8.3/10) render correctly without needing separate half-star glyphs.
+ */
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.track {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Empty stars are decoration (the label carries the value), but they still
+   need to read as "track" against the glass, so they use the tertiary ink. */
+.starEmpty {
+  color: rgba(198, 210, 226, 0.34);
+}
+
+.starFull {
+  color: #f5c518;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  /* Percentage width changes should not animate: ratings appear with their
+     data, and animating them would imply the value is changing. */
+}
+
+.fill .stars {
+  flex: none;
+}

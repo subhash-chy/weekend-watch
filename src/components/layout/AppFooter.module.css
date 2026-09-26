@@ -1,0 +1,125 @@
+/**
+ * AppFooter styles.
+ *
+ * The grid collapses from three columns to one without any JavaScript. The
+ * bottom bar is separated by a hairline rather than a heavier rule so it stays
+ * legible against the frosted panel.
+ */
+
+.footer {
+  position: relative;
+  margin-top: var(--space-8);
+
+  background-color: var(--glass-scrim);
+  background-image: linear-gradient(var(--glass-tint), var(--glass-tint));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-top: 1px solid var(--glass-border);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-6);
+
+  padding-block: var(--space-7);
+}
+
+.brandColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 30rem;
+  color: var(--ink-primary);
+}
+
+.blurb {
+  font-size: var(--text-body);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.heading {
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+}
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+
+  /* Generous hit area without changing the visual rhythm. */
+  padding-block: var(--space-1);
+  border-radius: var(--radius-sm);
+
+  color: var(--ink-secondary);
+  font-size: var(--text-body);
+
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--ink-primary);
+  }
+}
+
+.bottom {
+  border-top: 1px solid var(--glass-hairline);
+  background-color: rgba(0, 0, 0, 0.24);
+}
+
+.bottomInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+
+  padding-block: var(--space-4);
+
+  font-size: var(--text-small);
+  color: var(--ink-secondary);
+}
+
+.copyright {
+  color: var(--ink-tertiary);
+}
+
+.attribution {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-tertiary);
+}
+
+@media (max-width: 879px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+  }
+}
+
+@media (max-width: 639px) {
+  .bottomInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

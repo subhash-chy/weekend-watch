@@ -7,11 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output
 dist
 dist-ssr
 *.local
+
+# Test / coverage output
+coverage
+reports
+
+# Environment — only the template is committed
 .env
+.env.local
+.env.*.local
 .env.production
 
 # Editor directories and files
@@ -25,5 +36,6 @@ dist-ssr
 *.sln
 *.sw?
 
+# Lockfiles: keep npm's, ignore the others
 yarn.lock
-package-lock.json
+pnpm-lock.yaml

@@ -1,13 +1,133 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weekend Watch</title>
+
+    <!-- Viewport: `viewport-fit=cover` lets the layout extend into the notch
+         on iOS, where the frosted header sits under the status bar. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+
+    <title>Weekend Watch — Discover what to watch this weekend</title>
+    <meta
+      name="description"
+      content="Weekend Watch surfaces trending films and series from The Movie Database in one frosted-glass browse. See what is popular on streaming and on TV right now."
+    />
+    <meta name="author" content="Weekend Watch" />
+    <meta name="theme-color" content="#05070e" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://weekend-watch.example/" />
+
+    <!-- Open Graph / Twitter. Mirrored client-side per route by usePageSeo. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Weekend Watch" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:title"
+      content="Weekend Watch — Discover what to watch this weekend"
+    />
+    <meta
+      property="og:description"
+      content="Trending films and series from The Movie Database, in one frosted-glass browse."
+    />
+    <meta property="og:url" content="https://weekend-watch.example/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Weekend Watch — Discover what to watch" />
+    <meta
+      name="twitter:description"
+      content="Trending films and series from The Movie Database, in one frosted-glass browse."
+    />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23d81b3c'/%3E%3Cpath d='M12.5 9.5v13L23 16l-10.5-6.5Z' fill='%23fff'/%3E%3C/svg%3E"
+    />
+
+    <!--
+      Self-hosted variable fonts, preloaded.
+      `crossorigin` is required for font preloads even on a same-origin
+      request, because fonts are always fetched in CORS mode; omitting it makes
+      the browser fetch the file twice.
+    -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/inter-var-latin.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/space-grotesk-var-latin.woff2"
+      crossorigin
+    />
+
+    <!-- Warm the connections the hero artwork and API calls need. -->
+    <link rel="preconnect" href="https://image.tmdb.org" crossorigin />
+    <link rel="preconnect" href="https://api.themoviedb.org" crossorigin />
+
+    <!--
+      Structured data: declares the site and its search entry point so a search
+      engine can offer a sitelinks search box. This is a non-executable data
+      block, so it is unaffected by the `script-src 'self'` policy.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Weekend Watch",
+        "url": "https://weekend-watch.example/",
+        "description": "Trending films and series from The Movie Database, in one frosted-glass browse.",
+        "inLanguage": "en",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://weekend-watch.example/search?query={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
+
   <body>
+    <!--
+      The app mounts into #root. The noscript block is real content rather than
+      a bare "enable JavaScript" notice, so the page is still useful — and
+      indexable — with scripting disabled.
+    -->
     <div id="root"></div>
-    <script type="module" src="/src/main/main.tsx"></script>
+
+    <noscript>
+      <div
+        style="
+          max-width: 40rem;
+          margin: 4rem auto;
+          padding: 2rem;
+          font-family: system-ui, sans-serif;
+          color: #eaf0f8;
+          background: #0b1120;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 20px;
+        "
+      >
+        <h1 style="font-size: 1.5rem; margin: 0 0 0.75rem">
+          Weekend Watch needs JavaScript
+        </h1>
+        <p style="margin: 0; line-height: 1.55">
+          This catalogue is rendered in the browser, so it cannot load with scripting
+          disabled. Enable JavaScript to browse trending films and series.
+        </p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/app/main.tsx"></script>
   </body>
 </html>

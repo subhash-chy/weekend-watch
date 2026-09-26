@@ -1,0 +1,119 @@
+/**
+ * MediaCard styles.
+ *
+ * The poster frame reserves its box with `aspect-ratio`, so neither a slow
+ * image nor a failed one can shift the layout. Hover lifts the card with a
+ * transform only.
+ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.posterButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  /* `overflow: hidden` clips the poster to the frame's radius. */
+  overflow: hidden;
+  isolation: isolate;
+
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.posterFrame {
+  position: relative;
+  display: block;
+  /* Reserves the 2:3 box regardless of image state. */
+  aspect-ratio: var(--card-poster-ratio);
+  width: 100%;
+  overflow: hidden;
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+/* Hover scrim revealing the "view details" affordance. */
+.posterScrim {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--ink-primary);
+  background-image: linear-gradient(
+    to top,
+    rgba(3, 6, 12, 0.72) 0%,
+    rgba(3, 6, 12, 0.18) 60%,
+    rgba(3, 6, 12, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .posterButton:hover {
+    transform: translate3d(0, -6px, 0);
+    border-color: var(--glass-border-strong);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .posterButton:hover .poster {
+    transform: scale3d(1.05, 1.05, 1);
+  }
+
+  .posterButton:hover .posterScrim {
+    opacity: 1;
+  }
+}
+
+.posterButton:active {
+  transform: translate3d(0, -2px, 0) scale3d(0.99, 0.99, 1);
+  transition-duration: var(--duration-fast);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-normal);
+  color: var(--ink-primary);
+  line-height: var(--leading-snug);
+
+  /* Two-line clamp keeps rows aligned when titles vary in length. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.date {
+  font-size: var(--text-small);
+  color: var(--ink-tertiary);
+}

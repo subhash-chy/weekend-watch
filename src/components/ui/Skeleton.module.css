@@ -1,0 +1,41 @@
+/**
+ * Skeleton styles.
+ *
+ * The shimmer is a translating gradient inside an `overflow: hidden` box, so
+ * the animation touches only `transform` and never repaints the whole card.
+ */
+
+.skeleton {
+  position: relative;
+  display: block;
+  overflow: hidden;
+
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--glass-hairline);
+  border-radius: var(--radius-md);
+}
+
+.shimmer {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.09) 45%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  animation: ww-shimmer 1.6s var(--ease-in-out) infinite;
+}
+
+/* Card placeholder. Matches MediaCard's box exactly so the swap is shiftless. */
+.card {
+  aspect-ratio: var(--card-poster-ratio);
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-card-min), 1fr));
+}

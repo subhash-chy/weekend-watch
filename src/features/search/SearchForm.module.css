@@ -1,0 +1,136 @@
+/**
+ * SearchForm styles.
+ *
+ * The field is an inset well inside a raised glass bar, which is what makes the
+ * input read as "typed into" rather than "floating on". Focus is shown on the
+ * whole bar, not just the input, so the association between the glass surface
+ * and the caret is obvious.
+ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 46rem;
+}
+
+.label {
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-secondary);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+
+  background-color: var(--glass-tint);
+  background-image: linear-gradient(var(--glass-scrim), var(--glass-scrim));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+/* Highlight the whole bar when the input inside has focus. `:focus-within`
+   keeps this in CSS rather than in component state. */
+.field:focus-within {
+  border-color: var(--focus-ring);
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 3px rgba(143, 211, 255, 0.28);
+}
+
+.leadingIcon {
+  display: inline-flex;
+  flex: none;
+  color: var(--ink-tertiary);
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  height: 40px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background-color: transparent;
+
+  color: var(--ink-primary);
+  font-size: var(--text-body);
+}
+
+/* Placeholder uses the tertiary ink: 7.75:1 on the inset surface, well above
+   the 4.5:1 floor, so hint text is never washed out. */
+.input::placeholder {
+  color: var(--ink-tertiary);
+  opacity: 1;
+}
+
+/* Remove Safari's inset shadow so the field stays flat glass. */
+.input::-webkit-search-decoration,
+.input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.submit {
+  flex: none;
+  height: 40px;
+  padding-inline: var(--space-5);
+
+  border-radius: var(--radius-full);
+  background-color: var(--accent-fill);
+  color: var(--ink-primary);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .submit:hover {
+    background-color: var(--accent-fill-hover);
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.submit:active {
+  transform: scale3d(0.98, 0.98, 1);
+}
+
+.hint {
+  font-size: var(--text-caption);
+  color: var(--ink-tertiary);
+}
+
+.formLg .input {
+  height: 48px;
+  font-size: var(--text-body-lg);
+}
+
+.formLg .submit {
+  height: 48px;
+}
+
+@media (max-width: 519px) {
+  .field {
+    padding-left: var(--space-3);
+  }
+
+  .submit {
+    padding-inline: var(--space-4);
+  }
+}
